@@ -80,51 +80,58 @@ def mostrar_tabla_verdad(tabla, tipo):
 
 # Función principal que maneja el flujo
 def main():
-    print("Ingresa el primer argumento:")
-    primer_argumento = input("→ ")
+    while True:
+        print("\nIngresa el primer argumento:")
+        primer_argumento = input("→ ")
 
-    segundo_argumento = {'valor': None}
+        segundo_argumento = {'valor': None}
 
-    def leer_segundo_input():
-        segundo_argumento['valor'] = input("\nIngresa segundo argumento relacionado o espera 5 segundos:\n→ ")
+        def leer_segundo_input():
+            segundo_argumento['valor'] = input("\nIngresa segundo argumento relacionado o espera 5 segundos:\n→ ")
 
-    hilo_input = threading.Thread(target=leer_segundo_input)
-    hilo_input.start()
-    hilo_input.join(timeout=5)
+        hilo_input = threading.Thread(target=leer_segundo_input)
+        hilo_input.start()
+        hilo_input.join(timeout=5)
 
-    entrada = segundo_argumento['valor']
+        entrada = segundo_argumento['valor']
 
-    if entrada is None or entrada.strip() == "":
-        print("\n[Análisis automático de MP o MT basado en el primer argumento]")
-        if "si" in primer_argumento.lower() and "entonces" in primer_argumento.lower():
-            print("→ Resultado: Detectado Modus Ponens (por defecto)")
-            print(aplicar_modus_ponens(primer_argumento))
+        if entrada is None or entrada.strip() == "":
+            print("\n[Análisis automático de MP o MT basado en el primer argumento]")
+            if "si" in primer_argumento.lower() and "entonces" in primer_argumento.lower():
+                print("→ Resultado: Detectado Modus Ponens (por defecto)")
+                print(aplicar_modus_ponens(primer_argumento))
+            else:
+                print("→ Resultado: Argumento no válido para MP o MT\n")
+
+        elif entrada.lower() == 'mp':
+            print("\n[Aplicando regla lógica: Modus Ponens]")
+            print("→", aplicar_modus_ponens(primer_argumento))
+
+        elif entrada.lower() == 'mt':
+            print("\n[Aplicando regla lógica: Modus Tollens]")
+            print("→", aplicar_modus_tollens(primer_argumento))
+
+        elif ' o ' in entrada.lower():
+            print("\n[Detectando disyunción y evaluando proposición compuesta]")
+            print("→ Resultado: Por lo tanto, [proposición resultante] - Es una [tautología/contradicción/etc.]\n")
+
+            # Evaluamos la disyunción y mostramos la tabla de verdad
+            tabla = tabla_verdad_disyuncion()  # Evaluamos disyunción
+            mostrar_tabla_verdad(tabla, "Disyunción (P ∨ Q)")
+
         else:
-            print("→ Resultado: Argumento no válido para MP o MT\n")
+            resultado = detectar_regla_doble(primer_argumento, entrada)
+            if resultado:
+                print("\n[Análisis lógico a partir de dos argumentos]")
+                print("→", resultado)
+            else:
+                print("\nEntrada no reconocida como regla lógica ni disyunción.")
 
-    elif entrada.lower() == 'mp':
-        print("\n[Aplicando regla lógica: Modus Ponens]")
-        print("→", aplicar_modus_ponens(primer_argumento))
-
-    elif entrada.lower() == 'mt':
-        print("\n[Aplicando regla lógica: Modus Tollens]")
-        print("→", aplicar_modus_tollens(primer_argumento))
-
-    elif ' o ' in entrada.lower():
-        print("\n[Detectando disyunción y evaluando proposición compuesta]")
-        print("→ Resultado: Por lo tanto, [proposición resultante] - Es una [tautología/contradicción/etc.]\n")
-
-        # Evaluamos la disyunción y mostramos la tabla de verdad
-        tabla = tabla_verdad_disyuncion()  # Evaluamos disyunción
-        mostrar_tabla_verdad(tabla, "Disyunción (P ∨ Q)")
-
-    else:
-        resultado = detectar_regla_doble(primer_argumento, entrada)
-        if resultado:
-            print("\n[Análisis lógico a partir de dos argumentos]")
-            print("→", resultado)
-        else:
-            print("\nEntrada no reconocida como regla lógica ni disyunción.")
+        # Preguntar si quiere reiniciar el programa
+        reiniciar = input("\nPresiona Enter para reiniciar o escribe 'salir' para terminar: ")
+        if reiniciar.lower() == 'salir':
+            print("Saliendo del programa.")
+            break  # Salir del bucle y terminar el programa
 
 if __name__ == '__main__':
     main()
